@@ -29,11 +29,16 @@
     "url": "https://github.com/nation-io/sdk/issues"
   },
   "homepage": "https://github.com/nation-io/sdk#readme",
+  "dependencies": {
+    "@solana/web3.js": "^1.62.0",
+    "borsh": "^0.7.0"
+  },
   "devDependencies": {
     "@open-wc/building-rollup": "^2.0.2",
     "@rollup/plugin-commonjs": "^11.0.1",
     "@rollup/plugin-node-resolve": "^7.0.0",
     "@tsconfig/recommended": "^1.0.1",
+    "@types/bn.js": "^5.1.1",
     "@types/jest": "^29.0.3",
     "jest": "^29.0.3",
     "lerna": "^5.5.2",
