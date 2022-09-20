@@ -1,0 +1,6 @@
+# .gitignore
+out-tsc
+dist
+node_modules
+
+.parcel-cache
