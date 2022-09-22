@@ -1,6 +1,7 @@
 export type Dao = {
   id: string;
   name: string;
+  title?: string;
 };
 
 const mockDaos: Array<Dao> = [

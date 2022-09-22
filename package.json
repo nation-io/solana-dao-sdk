@@ -1,40 +1,29 @@
 {
-  "name": "@lucaslencinas/solana-dao-sdk",
-  "version": "0.0.5",
-  "description": "A javascript SDK for DAOs in Solana",
-  "source": "src/index.ts",
-  "main": "dist/main.js",
-  "module": "dist/module.js",
-  "types": "dist/types.d.ts",
+  "name": "root-sdk-monorepo",
+  "description": "Monorepo for the SDK for DAOs in Solana",
+  "private": true,
   "scripts": {
-    "test": "jest",
-    "watch": "parcel watch",
-    "build": "parcel build",
-    "example": "npm run build && cd examples/react-app-example-daos && npm link ../../ && npm install && npm run build && npm run start"
+    "build": "lerna run build",
+    "test": "CI=true lerna run test",
+    "test:sdk": "lerna run test --scope=solana-dao-sdk",
+    "web": "lerna run start --scope=react-app-example-daos",
+    "clean": "lerna clean && rm -rf ./node_modules"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lucaslencinas/solana-dao-sdk.git"
+    "url": "git+https://github.com/nation-io/sdk.git"
   },
-  "keywords": [
-    "solana",
-    "dao",
-    "sdk"
-  ],
-  "author": "Lucas Lencinas",
+  "author": "Lucas de Moreno",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lucaslencinas/solana-dao-sdk/issues"
+    "url": "https://github.com/nation-io/sdk/issues"
   },
-  "homepage": "https://github.com/lucaslencinas/solana-dao-sdk#readme",
+  "homepage": "https://github.com/nation-io/sdk#readme",
   "devDependencies": {
-    "@parcel/packager-ts": "^2.7.0",
-    "@parcel/transformer-typescript-types": "^2.7.0",
-    "@tsconfig/recommended": "^1.0.1",
-    "@types/jest": "^29.0.3",
-    "jest": "^29.0.3",
-    "parcel": "^2.7.0",
-    "ts-jest": "^29.0.1",
-    "typescript": "^4.8.3"
+    "@lerna/clean": "^5.5.2",
+    "lerna": "^5.5.2"
   }
 }
