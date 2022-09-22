@@ -7,7 +7,7 @@ Read our [Code of Conduct](./CODE_OF_CONDUCT.md) to keep our community approacha
 
 In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and merging the PR.
 
-At least for now that the project is private and its initial state we will follow the [Github flow](https://docs.github.com/en/get-started/quickstart/github-flow) creating branches, PRs and mergin to main.
+At least for now that the project is private and in its initial state we will follow the [Github flow](https://docs.github.com/en/get-started/quickstart/github-flow) creating branches, PRs, and merging to main.
 
 [Work in Progress]
 
