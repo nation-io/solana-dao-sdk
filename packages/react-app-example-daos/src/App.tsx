@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { SolanaDao } from "@lucaslencinas/solana-dao-sdk";
+import { SolanaDao } from "solana-dao-sdk";
 
 const client = new SolanaDao();
 
@@ -28,7 +28,7 @@ function App() {
           Learn React
         </a>
         {daos.map((dao) => {
-          return <DaoCard id={dao.id} name={dao.name} />;
+          return <DaoCard key={dao.id} id={dao.id} name={dao.name} />;
         })}
       </header>
     </div>
