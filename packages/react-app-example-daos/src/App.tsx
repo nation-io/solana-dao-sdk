@@ -17,7 +17,7 @@ const App: React.FunctionComponent = () => {
       <CssBaseline />
       <DaoProvider>
         <BrowserRouter>
-          <Container data-testId="container">
+          <Container data-testid="container">
             <Routes>
               <Route path="/" element={<Homepage />} />
               <Route path="/daos/:id" element={<DaoPage />} />
