@@ -5,6 +5,7 @@
   "scripts": {
     "build": "lerna run build",
     "test": "CI=true lerna run test",
+    "test:debug": "lerna run test --scope=solana-dao-sdk -- ",
     "test:sdk": "lerna run test --scope=solana-dao-sdk",
     "web": "lerna run start --scope=react-app-example-daos",
     "clean": "lerna clean && rm -rf ./node_modules"
