@@ -1,48 +1,25 @@
 import { PublicKey } from '@solana/web3.js';
-import { BinaryReader, BinaryWriter, deserialize, Schema } from 'borsh';
-import { AccountType } from './governance/model';
 import BN from 'bn.js';
-
-export const extendBorsh = () => {
-  (BinaryReader.prototype as any).readPubkey = function () {
-    const reader = this as unknown as BinaryReader;
-    const array = reader.readFixedArray(32);
-    const pk = new PublicKey(array);
-    return pk;
-  };
-
-  (BinaryWriter.prototype as any).writePubkey = function (value: PublicKey) {
-    const writer = this as unknown as BinaryWriter;
-    writer.writeFixedArray(value.toBuffer());
-  };
-};
-
-extendBorsh();
-
-// TODO move to some constants.ts
-export const SYSTEM_PROGRAM_ID = new PublicKey(
-    '11111111111111111111111111111111',
-  );
+import { Coder } from '@project-serum/anchor';
 
 class RealmConfig {
-    accountType = AccountType.RealmConfig;
     realm: PublicKey;
-    minCommunityTokensToCreateGovernance: BN;
+    minCommunityWeightToCreateGovernance: BN;
     councilMint?: PublicKey;
 
     constructor(args: {
         realm: PublicKey;
-        minCommunityTokensToCreateGovernance: BN;
+        minCommunityWeightToCreateGovernance: BN;
         councilMint?: PublicKey;
     }) {
         this.realm = args.realm;
-        this.minCommunityTokensToCreateGovernance = args.minCommunityTokensToCreateGovernance;
+        this.minCommunityWeightToCreateGovernance = args.minCommunityWeightToCreateGovernance;
         this.councilMint = args.councilMint;
     }
 }
 
+// types doesn't seem to be exported for spl-governance on Anchor :(
 class Realm {
-    accountType = AccountType.RealmV2;
     communityMint: PublicKey;
     config: RealmConfig;
     reserved: Uint8Array;
@@ -67,69 +44,11 @@ class Realm {
     }
 }
 
-enum MintMaxVoteWeightSourceType {
-  SupplyFraction = 0,
-  Absolute = 1,
-}
-
-class MintMaxVoteWeightSource {
-  type = MintMaxVoteWeightSourceType.SupplyFraction;
-  value: BN;
-
-  constructor(args: { value: BN }) {
-    this.value = args.value;
-  }
-}
-
-const realmV2BorshSchema: Schema = new Map<Function, any>(
-    [
-        [
-          RealmConfig,
-          {
-            kind: 'struct',
-            fields: [
-              ['legacy1', 'u8'],
-              ['legacy2', 'u8'],
-              ['reserved', [6]],
-              ['minCommunityTokensToCreateGovernance', 'u64'],
-              ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
-              ['councilMint', { kind: 'option', type: 'pubkey' }],
-            ],
-          },
-        ],
-        [
-          Realm,
-          {
-            kind: 'struct',
-            fields: [
-              ['accountType', 'u8'],
-              ['communityMint', 'pubkey'],
-              ['config', RealmConfig],
-              ['reserved', [6]],
-              ['votingProposalCount', 'u16'],
-              ['authority', { kind: 'option', type: 'pubkey' }],
-              ['name', 'string'],
-              ['reserved_v2', [128]],
-            ],
-          },
-        ],
-        [
-          MintMaxVoteWeightSource,
-          {
-            kind: 'struct',
-            fields: [
-              ['type', 'u8'],
-              ['value', 'u64'],
-            ],
-          },
-        ]
-    ]
-)
-
 export class RealmV2Serializer {
-    deserialize(buffer: Buffer) {
+    constructor(readonly coder: Coder){}
+    deserialize(buffer: Buffer): Realm {
         try {
-          return deserialize(realmV2BorshSchema, Realm, buffer);
+          return this.coder.accounts.decode<Realm>("realmV2", buffer);
         } catch (e) {
           throw e;
         }
