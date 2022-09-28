@@ -1,49 +1,31 @@
-import React, { useEffect, useState } from "react";
-import logo from "./logo.svg";
+import React from "react";
 import "./App.css";
-import { SolanaDao } from "solana-dao-sdk";
+import CssBaseline from "@mui/material/CssBaseline";
+import { Container } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { DaoProvider } from "./providers/DaoProvider";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Homepage } from "./components/HomePage";
+import { DaoPage } from "./components/DaoPage";
 
-const client = new SolanaDao();
+const theme = createTheme();
 
-function App() {
-  const [daos, setDaos] = useState<Array<{ id: string; name: string }>>([]);
-
-  useEffect(() => {
-    setDaos(client.getDaos());
-  }, []);
-
+const App: React.FunctionComponent = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        {daos.map((dao) => {
-          return <DaoCard key={dao.id} id={dao.id} name={dao.name} />;
-        })}
-      </header>
-    </div>
-  );
-}
-
-const DaoCard: React.FunctionComponent<{ id: string; name: string }> = ({
-  id,
-  name,
-}) => {
-  return (
-    <div className="dao-card">
-      <p>{id}</p>
-      <p>{name}</p>
-    </div>
+    <ThemeProvider theme={theme}>
+      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+      <CssBaseline />
+      <DaoProvider>
+        <BrowserRouter>
+          <Container data-testid="container">
+            <Routes>
+              <Route path="/" element={<Homepage />} />
+              <Route path="/daos/:id" element={<DaoPage />} />
+            </Routes>
+          </Container>
+        </BrowserRouter>
+      </DaoProvider>
+    </ThemeProvider>
   );
 };
 
