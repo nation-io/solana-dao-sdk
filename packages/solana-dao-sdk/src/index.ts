@@ -1,11 +1,19 @@
-import { Connection, clusterApiUrl, PublicKey } from '@solana/web3.js';
-import { getRealm, getAllTokenOwnerRecords, BN_ZERO } from '@solana/spl-governance';
+import { Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
+import {
+  getRealm,
+  getAllTokenOwnerRecords,
+  BN_ZERO,
+} from "@solana/spl-governance";
 
-const DEFAULT_PROGRAM_ID = new PublicKey('gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY');
+import { RpcContext } from "@solana/spl-governance";
+import { createMultisigRealm1 } from "./internal/realms";
 
+const DEFAULT_PROGRAM_ID = new PublicKey(
+  "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY"
+);
 /**
  * Note: This interface is an abstraction introduced by the SDK so that consumers don't care about having to (de)serialize deprecated or unused fields
- * or the fact that some fields are nester in other objects. 
+ * or the fact that some fields are nester in other objects.
  * For more info, check the smart contract https://github.com/solana-labs/solana-program-library/blob/a179eba71e63ba18128cc466e3fd0f7535f4c5fd/governance/program/src/state/realm.rs#L133
  */
 export type Dao = {
@@ -24,39 +32,73 @@ export type Dao = {
 };
 
 /**
-  * For more info, check the smart contract https://github.com/solana-labs/solana-program-library/blob/c5db9cec78097043fab5d1512acc1980ba43c0e3/governance/program/src/state/token_owner_record.rs#L34
-  */ 
+ * For more info, check the smart contract https://github.com/solana-labs/solana-program-library/blob/c5db9cec78097043fab5d1512acc1980ba43c0e3/governance/program/src/state/token_owner_record.rs#L34
+ */
 export type Member = {
   publicKey: PublicKey;
 };
 
 export class SolanaDao {
   connection: Connection;
-  
+
   constructor(connection?: Connection) {
-    this.connection = connection ? connection : new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
+    this.connection = connection
+      ? connection
+      : new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
+  }
+
+  async createDao(
+    {
+      connection,
+      programId,
+      programVersion,
+    }: Pick<RpcContext, "connection" | "programId" | "programVersion">,
+    wallet: TestWallet,
+    councilWalletsPks: PublicKey[],
+    name: string,
+    yesVoteThreshold: number
+  ): Promise<{
+    tx: number;
+    communityMintPk: PublicKey;
+    councilMintPk: PublicKey;
+  }> {
+    const response = await createMultisigRealm1(
+      connection,
+      wallet,
+      councilWalletsPks,
+      programId,
+      programVersion,
+      name,
+      yesVoteThreshold
+    );
+    return response;
   }
 
   async getDao(daoPublicKey: PublicKey): Promise<Dao | null> {
     const realm = (await getRealm(this.connection, daoPublicKey)).account;
-    
+
     return {
       publicKey: daoPublicKey,
       name: realm.name,
       authority: realm.authority,
       communityMint: realm.communityMint,
       councilMint: realm.config.councilMint,
-      minCommunityTokensToCreateGovernance: realm.config.minCommunityTokensToCreateGovernance.toString(10),
-      votingProposalCount: realm.votingProposalCount
+      minCommunityTokensToCreateGovernance:
+        realm.config.minCommunityTokensToCreateGovernance.toString(10),
+      votingProposalCount: realm.votingProposalCount,
     };
   }
 
   async getMembers(daoPublicKey: PublicKey): Promise<Member[]> {
-    const allTokenRecords = await getAllTokenOwnerRecords(this.connection, DEFAULT_PROGRAM_ID, daoPublicKey);
+    const allTokenRecords = await getAllTokenOwnerRecords(
+      this.connection,
+      DEFAULT_PROGRAM_ID,
+      daoPublicKey
+    );
     return allTokenRecords
-            .map(record => record.account)
-            .filter(account => account.governingTokenDepositAmount.gt(BN_ZERO))
-            .map(account => ({publicKey: account.governingTokenOwner}));
+      .map((record) => record.account)
+      .filter((account) => account.governingTokenDepositAmount.gt(BN_ZERO))
+      .map((account) => ({ publicKey: account.governingTokenOwner }));
   }
 
   getDaos(): Array<Dao> {
