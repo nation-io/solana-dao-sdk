@@ -1,6 +1,5 @@
 import { SolanaDao } from "./index";
 import { PublicKey } from "@solana/web3.js";
-import { BN } from "bn.js";
 
 describe("SolanaDao", () => {
   test("calling getDao return a value", async () => {

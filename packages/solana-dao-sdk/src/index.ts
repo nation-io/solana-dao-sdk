@@ -1,5 +1,4 @@
 import { Connection, clusterApiUrl, PublicKey } from '@solana/web3.js';
-import { AccountType } from './internal/governance/model';
 import { RealmV2Serializer } from './internal/serialization';
 import BN from 'bn.js';
 
@@ -37,11 +36,6 @@ export class SolanaDao {
       return null;
     }
     const buffer: Buffer = accountInfo.data;
-    // first field must be the account type
-    const accountType = buffer[0];
-    if (accountType !== AccountType.RealmV2.valueOf()) {
-      return null;
-    }
     const realm = this.serializer.deserialize(buffer);
     
     return {

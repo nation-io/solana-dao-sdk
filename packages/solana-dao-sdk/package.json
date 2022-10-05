@@ -33,7 +33,7 @@
   "homepage": "https://github.com/nation-io/sdk#readme",
   "dependencies": {
     "@solana/web3.js": "^1.62.0",
-    "borsh": "^0.7.0"
+    "@solana/spl-governance": "^0.3.14"
   },
   "devDependencies": {
     "@open-wc/building-rollup": "^2.0.2",
