@@ -2,6 +2,12 @@
 
 This is a very simple example of how you can use the Solana DAO SDK in you frontend.
 
+## Moving to react-app-rewired
+
+Due to a couple of issues we started using create-app-rewired.
+This is because CRA doesn't handle .cjs files and inside the spl-governance dependecy tree we have a few of them when compiled.
+More info in this [Discord message](https://discord.com/channels/910194960941338677/910566058740568094/959837943265116250) and in this [react-app issue](https://github.com/facebook/create-react-app/pull/12021)
+
 ## Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

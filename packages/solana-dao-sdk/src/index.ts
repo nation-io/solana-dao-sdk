@@ -4,9 +4,11 @@ import {
   getAllTokenOwnerRecords,
   BN_ZERO,
 } from "@solana/spl-governance";
-
-import { RpcContext } from "@solana/spl-governance";
-import { createMultisigRealm1 } from "./internal/realms";
+import {
+  DaoService,
+  MultiSigDaoResponse,
+} from "./internal/services/daoService";
+import { Wallet } from "./wallet";
 
 const DEFAULT_PROGRAM_ID = new PublicKey(
   "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY"
@@ -37,40 +39,39 @@ export type Dao = {
 export type Member = {
   publicKey: PublicKey;
 };
-
 export class SolanaDao {
   connection: Connection;
+  wallet: Wallet | null = null;
+  service: DaoService;
 
   constructor(connection?: Connection) {
     this.connection = connection
       ? connection
       : new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
+
+    this.service = new DaoService(this.connection, this.wallet);
+  }
+
+  setWallet(wallet: Wallet) {
+    this.wallet = wallet;
+    this.service.setWallet(wallet);
   }
 
   async createDao(
-    {
-      connection,
-      programId,
-      programVersion,
-    }: Pick<RpcContext, "connection" | "programId" | "programVersion">,
-    wallet: TestWallet,
     councilWalletsPks: PublicKey[],
     name: string,
     yesVoteThreshold: number
-  ): Promise<{
-    tx: number;
-    communityMintPk: PublicKey;
-    councilMintPk: PublicKey;
-  }> {
-    const response = await createMultisigRealm1(
-      connection,
-      wallet,
+  ): Promise<MultiSigDaoResponse> {
+    if (!this.wallet) {
+      throw new Error("There is no wallet available");
+    }
+
+    const response = await this.service.createMultisigDao(
       councilWalletsPks,
-      programId,
-      programVersion,
       name,
       yesVoteThreshold
     );
+
     return response;
   }
 

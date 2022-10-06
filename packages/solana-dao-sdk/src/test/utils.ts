@@ -1,9 +1,9 @@
 import { Connection, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { TestWallet } from "..";
+import { TestWallet } from "../wallet";
 
 export async function createWallet(
   connection: Connection,
-  initialBalance: number = LAMPORTS_PER_SOL
+  initialBalance: number = LAMPORTS_PER_SOL / 10
 ): Promise<TestWallet> {
   const keypair = Keypair.generate();
 
@@ -25,4 +25,8 @@ export async function createWallet(
   const wallet = new TestWallet(keypair);
 
   return wallet;
+}
+
+export function randomId() {
+  return (Math.random() + 1).toString(36).substring(10);
 }

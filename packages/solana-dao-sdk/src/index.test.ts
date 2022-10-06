@@ -1,6 +1,6 @@
 import { SolanaDao } from "./index";
 import { PublicKey, Connection, clusterApiUrl } from "@solana/web3.js";
-import { createWallet } from "./test/utils";
+import { createWallet, randomId } from "./test/utils";
 
 describe("SolanaDao", () => {
   test("calling getDao return a value", async () => {
@@ -44,34 +44,25 @@ describe("SolanaDao", () => {
     });
   });
 
-  test("calling createDao creates a simple MultiSig dao", async () => {
+  test("createDao creates a simpleDAO with default values", async () => {
     const devnetConnection = new Connection(
       clusterApiUrl("devnet"),
       "finalized"
     );
-    const client = new SolanaDao(devnetConnection);
     const userWallet = await createWallet(devnetConnection);
+    const client = new SolanaDao(devnetConnection);
+    client.setWallet(userWallet);
 
-    const programId = new PublicKey(
-      "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw"
-    );
-
-    const randomName = (Math.random() + 1).toString(36).substring(10);
-    const daoName = `dao ${randomName}`;
-
-    const someDao = await client.createDao(
-      {
-        connection: client.connection,
-        programId,
-        programVersion: 2,
-      },
-      userWallet,
+    const daoName = `dao ${randomId()}`;
+    const createdDao = await client.createDao(
       [userWallet.publicKey],
       daoName,
       60
     );
-    console.log("finish", someDao);
 
-    expect(someDao).toBeTruthy();
+    // Checking that we receive the publicKeys
+    expect(createdDao.communityMintPk).toBeTruthy();
+    expect(createdDao.councilMintPk).toBeTruthy();
+    expect(createdDao.daoPk).toBeTruthy();
   });
 });
