@@ -16,4 +16,14 @@ describe("SolanaDao", () => {
     };
     expect(actualDao).toEqual(expectedDao);
   });
+
+  test("calling getMembers return values", async () => {
+    const client = new SolanaDao();
+    const actualMembers = await client.getMembers(new PublicKey("5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d"));
+    expect(actualMembers).toContainEqual({ publicKey: new PublicKey("8nRQHj1RT7BQrhQ8jhRAoCUx8xrG4CxecNQRpyxvK7Zv") });
+    expect(actualMembers).toContainEqual({ publicKey: new PublicKey("LXppnYxEkEHaNsWCPkNwZzTXMQepLpi1iHytb3wZ5Qd") });
+    expect(actualMembers).toContainEqual({ publicKey: new PublicKey("5s9cM71STMqBYuk3oUztCSd2jjYh4G8RyxvFbdy3r4Qz") });
+    expect(actualMembers).toContainEqual({ publicKey: new PublicKey("AJh9U6Vc22BXXiaspkeaDJSd4KL1Lz9Qrmd59XTfLNwo") });
+    expect(actualMembers).toContainEqual({ publicKey: new PublicKey("EWcyEuktFMCUUzQ4vZPSjYtbBp3euwDJa8BN3MwZKVmY") });
+  });
 });
