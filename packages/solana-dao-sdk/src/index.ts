@@ -1,6 +1,5 @@
 import { Connection, clusterApiUrl, PublicKey } from '@solana/web3.js';
-import { RealmV2Serializer } from './internal/serialization';
-import BN from 'bn.js';
+import { getRealm } from '@solana/spl-governance';
 
 /**
  * Note: This interface is an abstraction introduced by the SDK so that consumers don't care about having to (de)serialize deprecated or unused fields
@@ -24,19 +23,13 @@ export type Dao = {
 
 export class SolanaDao {
   connection: Connection;
-  serializer = new RealmV2Serializer();
   
   constructor(connection?: Connection) {
     this.connection = connection ? connection : new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
   }
 
   async getDao(publicKey: PublicKey): Promise<Dao | null> {
-    const accountInfo = await this.connection.getAccountInfo(publicKey);
-    if (!accountInfo) {
-      return null;
-    }
-    const buffer: Buffer = accountInfo.data;
-    const realm = this.serializer.deserialize(buffer);
+    const realm = (await getRealm(this.connection, publicKey)).account;
     
     return {
       publicKey: publicKey,
