@@ -1,5 +1,7 @@
 import { Connection, clusterApiUrl, PublicKey } from '@solana/web3.js';
-import { getRealm } from '@solana/spl-governance';
+import { getRealm, getAllTokenOwnerRecords, BN_ZERO } from '@solana/spl-governance';
+
+const DEFAULT_PROGRAM_ID = new PublicKey('gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY');
 
 /**
  * Note: This interface is an abstraction introduced by the SDK so that consumers don't care about having to (de)serialize deprecated or unused fields
@@ -21,6 +23,13 @@ export type Dao = {
   votingProposalCount: number;
 };
 
+/**
+  * For more info, check the smart contract https://github.com/solana-labs/solana-program-library/blob/c5db9cec78097043fab5d1512acc1980ba43c0e3/governance/program/src/state/token_owner_record.rs#L34
+  */ 
+export type Member = {
+  publicKey: PublicKey;
+};
+
 export class SolanaDao {
   connection: Connection;
   
@@ -28,11 +37,11 @@ export class SolanaDao {
     this.connection = connection ? connection : new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
   }
 
-  async getDao(publicKey: PublicKey): Promise<Dao | null> {
-    const realm = (await getRealm(this.connection, publicKey)).account;
+  async getDao(daoPublicKey: PublicKey): Promise<Dao | null> {
+    const realm = (await getRealm(this.connection, daoPublicKey)).account;
     
     return {
-      publicKey: publicKey,
+      publicKey: daoPublicKey,
       name: realm.name,
       authority: realm.authority,
       communityMint: realm.communityMint,
@@ -41,6 +50,15 @@ export class SolanaDao {
       votingProposalCount: realm.votingProposalCount
     };
   }
+
+  async getMembers(daoPublicKey: PublicKey): Promise<Member[]> {
+    const allTokenRecords = await getAllTokenOwnerRecords(this.connection, DEFAULT_PROGRAM_ID, daoPublicKey);
+    return allTokenRecords
+            .map(record => record.account)
+            .filter(account => account.governingTokenDepositAmount.gt(BN_ZERO))
+            .map(account => ({publicKey: account.governingTokenOwner}));
+  }
+
   getDaos(): Array<Dao> {
     throw new Error("Not implemented yet.");
   }
