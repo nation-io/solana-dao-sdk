@@ -54,11 +54,15 @@ describe("SolanaDao", () => {
     client.setWallet(userWallet);
 
     const daoName = `dao ${randomId()}`;
+
     const createdDao = await client.createDao(
       [userWallet.publicKey],
       daoName,
       60
     );
+
+    // So we can check on the Explorer how it looks.
+    console.log(createdDao.signatures);
 
     // Checking that we receive the publicKeys
     expect(createdDao.communityMintPk).toBeTruthy();

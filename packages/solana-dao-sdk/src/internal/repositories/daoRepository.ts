@@ -23,7 +23,6 @@ import {
 } from "../units";
 import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { Wallet } from "../../wallet";
-import { TOKEN_PROGRAM_ID } from "../tokens";
 
 // The community mint is going to have 0 supply and we arbitrarily set it to 1m
 const minCommunityTokensToCreate = MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY;

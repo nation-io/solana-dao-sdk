@@ -4,12 +4,14 @@ import {
   sendAndConfirmRawTransaction,
   Transaction,
   TransactionInstruction,
+  BlockhashWithExpiryBlockHeight,
 } from "@solana/web3.js";
 import base58 from "bs58";
 
 import { Wallet } from "../../wallet";
 import { TokenRepository } from "../repositories/tokenRepository";
 import { DaoRepository } from "../repositories/daoRepository";
+import { sendTransactions } from "../sender";
 
 const communityMintDecimals = 6;
 const tokenAmount = 1;
@@ -18,6 +20,7 @@ export type MultiSigDaoResponse = {
   daoPk: PublicKey;
   communityMintPk: PublicKey;
   councilMintPk: PublicKey;
+  signatures: string[];
 };
 
 export class DaoService {
@@ -50,30 +53,51 @@ export class DaoService {
       }
 
       const walletPk = this.wallet.publicKey;
+      const recentBlockhash = await this.connection.getLatestBlockhash();
 
-      const { communityMintPk, councilMintPk } = await this.createMintsForDao(
-        walletPk
-      );
-
-      const { walletAtaPk } = await this.mintCouncilTokensToMembers(
-        walletPk,
-        councilWalletsPks,
-        councilMintPk
-      );
-
-      const { daoPk } = await this.createConfiguredDao(
-        name,
-        yesVoteThreshold,
-        walletPk,
+      const {
         communityMintPk,
         councilMintPk,
-        walletAtaPk
+        transaction: mintTransaction,
+      } = await this.createMintsForDao(walletPk, recentBlockhash);
+
+      const { walletAtaPk, transaction: membersTransaction } =
+        await this.mintCouncilTokensToMembers(
+          walletPk,
+          councilWalletsPks,
+          councilMintPk,
+          recentBlockhash
+        );
+
+      const { daoPk, transaction: daoTransaction } =
+        await this.createConfiguredDao(
+          name,
+          yesVoteThreshold,
+          walletPk,
+          communityMintPk,
+          councilMintPk,
+          walletAtaPk,
+          recentBlockhash
+        );
+
+      const transactions = [
+        mintTransaction,
+        membersTransaction,
+        daoTransaction,
+      ];
+
+      const signatures = await sendTransactions(
+        this.wallet,
+        this.connection,
+        transactions,
+        recentBlockhash
       );
 
       return {
         daoPk,
         communityMintPk: communityMintPk,
         councilMintPk: councilMintPk,
+        signatures,
       };
     } catch (ex) {
       console.error(ex);
@@ -84,8 +108,10 @@ export class DaoService {
   private async mintCouncilTokensToMembers(
     walletPk: PublicKey,
     councilWalletsPks: PublicKey[],
-    councilMintPk: PublicKey
+    councilMintPk: PublicKey,
+    recentBlockhash: BlockhashWithExpiryBlockHeight
   ): Promise<{
+    transaction: Transaction;
     walletAtaPk: PublicKey;
   }> {
     const instructions: TransactionInstruction[] = [];
@@ -122,39 +148,25 @@ export class DaoService {
       throw new Error("Current wallet must be in the team");
     }
 
-    const recentBlockhash2 = await this.connection.getLatestBlockhash();
-    const councilTokenRelatedTx = new Transaction({
-      blockhash: recentBlockhash2.blockhash,
-      lastValidBlockHeight: recentBlockhash2.lastValidBlockHeight,
+    const transaction = new Transaction({
+      blockhash: recentBlockhash.blockhash,
+      lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
       feePayer: this.wallet.publicKey,
     });
 
-    instructions.forEach((instruction) =>
-      councilTokenRelatedTx.add(instruction)
-    );
+    instructions.forEach((instruction) => transaction.add(instruction));
 
-    const signedTxs2 = await this.wallet.signAllTransactions([
-      councilTokenRelatedTx,
-    ]);
-    const recentBlockhash3 = await this.connection.getLatestBlockhash();
-
-    await Promise.all(
-      signedTxs2.map((signed) => {
-        const rawTransaction = signed.serialize();
-        return sendAndConfirmRawTransaction(this.connection, rawTransaction, {
-          signature: base58.encode(signed.signature!),
-          blockhash: recentBlockhash3.blockhash,
-          lastValidBlockHeight: recentBlockhash3.lastValidBlockHeight,
-        });
-      })
-    );
-
-    return { walletAtaPk };
+    return { transaction, walletAtaPk };
   }
 
   private async createMintsForDao(
-    walletPk: PublicKey
-  ): Promise<{ communityMintPk: PublicKey; councilMintPk: PublicKey }> {
+    walletPk: PublicKey,
+    recentBlockhash: BlockhashWithExpiryBlockHeight
+  ): Promise<{
+    transaction: Transaction;
+    communityMintPk: PublicKey;
+    councilMintPk: PublicKey;
+  }> {
     if (!this.wallet) {
       throw new Error("There is no wallet available");
     }
@@ -173,53 +185,30 @@ export class DaoService {
       walletPk
     );
 
-    const recentBlockhash = await this.connection.getLatestBlockhash();
-    const communityMintTx = new Transaction({
-      blockhash: recentBlockhash.blockhash,
-      lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
-      feePayer: this.wallet.publicKey,
-    });
-
-    const councilsMintTx = new Transaction({
+    const transaction = new Transaction({
       blockhash: recentBlockhash.blockhash,
       lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
       feePayer: this.wallet.publicKey,
     });
 
     communityMint.instructions.forEach((instruction) =>
-      communityMintTx.add(instruction)
+      transaction.add(instruction)
+    );
+
+    councilMint.instructions.forEach((instruction) =>
+      transaction.add(instruction)
     );
 
     if (communityMint.signers.length > 0) {
-      communityMintTx.partialSign(...communityMint.signers);
+      transaction.partialSign(...communityMint.signers);
     }
-
-    councilMint.instructions.forEach((instruction) =>
-      councilsMintTx.add(instruction)
-    );
 
     if (councilMint.signers.length > 0) {
-      councilsMintTx.partialSign(...councilMint.signers);
+      transaction.partialSign(...councilMint.signers);
     }
 
-    const signedTxs1 = await this.wallet.signAllTransactions([
-      communityMintTx,
-      councilsMintTx,
-    ]);
-
-    const recentBlockhash1 = await this.connection.getLatestBlockhash();
-
-    await Promise.all(
-      signedTxs1.map((signed) => {
-        const rawTransaction = signed.serialize();
-        return sendAndConfirmRawTransaction(this.connection, rawTransaction, {
-          signature: base58.encode(signed.signature!),
-          blockhash: recentBlockhash1.blockhash,
-          lastValidBlockHeight: recentBlockhash1.lastValidBlockHeight,
-        });
-      })
-    );
     return {
+      transaction,
       communityMintPk: communityMint.publicKey,
       councilMintPk: councilMint.publicKey,
     };
@@ -231,8 +220,9 @@ export class DaoService {
     walletPk: PublicKey,
     communityMintPk: PublicKey,
     councilMintPk: PublicKey,
-    walletAtaPk: PublicKey
-  ): Promise<{ daoPk: PublicKey }> {
+    walletAtaPk: PublicKey,
+    recentBlockhash: BlockhashWithExpiryBlockHeight
+  ): Promise<{ daoPk: PublicKey; transaction: Transaction }> {
     if (!this.wallet) {
       throw new Error("There is no wallet available");
     }
@@ -246,29 +236,14 @@ export class DaoService {
       walletAtaPk
     );
 
-    const recentBlockhash4 = await this.connection.getLatestBlockhash();
-    const realmRelatedTx = new Transaction({
-      blockhash: recentBlockhash4.blockhash,
-      lastValidBlockHeight: recentBlockhash4.lastValidBlockHeight,
+    const transaction = new Transaction({
+      blockhash: recentBlockhash.blockhash,
+      lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
       feePayer: this.wallet.publicKey,
     });
 
-    instructions.forEach((instruction) => realmRelatedTx.add(instruction));
+    instructions.forEach((instruction) => transaction.add(instruction));
 
-    const signedTxs3 = await this.wallet.signAllTransactions([realmRelatedTx]);
-    const recentBlockhash5 = await this.connection.getLatestBlockhash();
-
-    await Promise.all(
-      signedTxs3.map((signed) => {
-        const rawTransaction = signed.serialize();
-        return sendAndConfirmRawTransaction(this.connection, rawTransaction, {
-          signature: base58.encode(signed.signature!),
-          blockhash: recentBlockhash5.blockhash,
-          lastValidBlockHeight: recentBlockhash5.lastValidBlockHeight,
-        });
-      })
-    );
-
-    return { daoPk };
+    return { daoPk, transaction };
   }
 }

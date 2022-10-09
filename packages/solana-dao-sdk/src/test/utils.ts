@@ -20,7 +20,7 @@ export async function createWallet(
   });
 
   const balance = await connection.getBalance(keypair.publicKey);
-  console.log(`Wallet created with: ${balance} LAMPORTS`);
+  console.log(`Wallet ${keypair.publicKey} created with: ${balance} LAMPORTS`);
 
   const wallet = new TestWallet(keypair);
 
@@ -28,5 +28,5 @@ export async function createWallet(
 }
 
 export function randomId() {
-  return (Math.random() + 1).toString(36).substring(10);
+  return Math.random().toString(36).slice(2, 10);
 }
