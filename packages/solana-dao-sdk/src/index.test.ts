@@ -22,7 +22,7 @@ describe("SolanaDao", () => {
     expect(actualDao).toEqual(expectedDao);
   });
 
-  test("calling getMembers return values", async () => {
+  test.skip("calling getMembers return values", async () => {
     const client = new SolanaDao();
     const actualMembers = await client.getMembers(
       new PublicKey("5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d")
@@ -47,7 +47,7 @@ describe("SolanaDao", () => {
   test("createDao creates a simpleDAO with default values", async () => {
     const devnetConnection = new Connection(
       clusterApiUrl("devnet"),
-      "finalized"
+      "confirmed"
     );
     const userWallet = await createWallet(devnetConnection);
     const client = new SolanaDao(devnetConnection);
@@ -55,18 +55,10 @@ describe("SolanaDao", () => {
 
     const daoName = `dao ${randomId()}`;
 
-    const createdDao = await client.createDao(
-      [userWallet.publicKey],
-      daoName,
-      60
-    );
+    const createdDao = await client.createDao(daoName);
 
-    // So we can check on the Explorer how it looks.
-    console.log(createdDao.signatures);
+    const retrievedDao = await client.getDao(createdDao.daoPk);
 
-    // Checking that we receive the publicKeys
-    expect(createdDao.communityMintPk).toBeTruthy();
-    expect(createdDao.councilMintPk).toBeTruthy();
-    expect(createdDao.daoPk).toBeTruthy();
+    expect(retrievedDao?.name).toBe(daoName);
   });
 });

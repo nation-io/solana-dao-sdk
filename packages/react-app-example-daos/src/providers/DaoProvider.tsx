@@ -1,6 +1,5 @@
 import React, { createContext, PropsWithChildren, useContext } from "react";
 import { SolanaDao } from "solana-dao-sdk";
-import { Connection, clusterApiUrl } from "@solana/web3.js";
 
 type ContextType = SolanaDao;
 
@@ -19,9 +18,8 @@ export const useDaoClient = (): ContextType => {
 export const DaoProvider: React.FunctionComponent<PropsWithChildren> = ({
   children,
 }) => {
-  const devnetConnection = new Connection(clusterApiUrl("devnet"), "finalized");
   return (
-    <DaoContext.Provider value={new SolanaDao(devnetConnection)}>
+    <DaoContext.Provider value={new SolanaDao()}>
       {children}
     </DaoContext.Provider>
   );

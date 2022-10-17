@@ -7,15 +7,6 @@ import {
 } from "@solana/web3.js";
 import base58 from "bs58";
 
-/**
- * Utility function that sequentially sends and confirm already signed transactions.
- *
- * @param wallet
- * @param connection
- * @param transactions
- * @param recentBlockhash
- * @returns the signatures of each transaction
- */
 export async function sendTransactions(
   wallet: Wallet,
   connection: Connection,
@@ -24,10 +15,10 @@ export async function sendTransactions(
 ): Promise<string[]> {
   const signedTxs = await wallet.signAllTransactions(transactions);
 
-  const signatures: string[] = [];
+  const transactionsSignatures: string[] = [];
   for (const signed of signedTxs) {
     const rawTransaction = signed.serialize();
-    const signature = await sendAndConfirmRawTransaction(
+    const transactionSignature = await sendAndConfirmRawTransaction(
       connection,
       rawTransaction,
       {
@@ -40,8 +31,8 @@ export async function sendTransactions(
       }
     );
 
-    signatures.push(signature);
+    transactionsSignatures.push(transactionSignature);
   }
 
-  return signatures;
+  return transactionsSignatures;
 }

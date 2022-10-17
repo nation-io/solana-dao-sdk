@@ -1,12 +1,10 @@
 import {
   Connection,
   PublicKey,
-  sendAndConfirmRawTransaction,
   Transaction,
   TransactionInstruction,
   BlockhashWithExpiryBlockHeight,
 } from "@solana/web3.js";
-import base58 from "bs58";
 
 import { Wallet } from "../../wallet";
 import { TokenRepository } from "../repositories/tokenRepository";
@@ -47,62 +45,53 @@ export class DaoService {
     name: string,
     yesVoteThreshold: number
   ): Promise<MultiSigDaoResponse> {
-    try {
-      if (!this.wallet) {
-        throw new Error("There is no wallet available");
-      }
+    if (!this.wallet) {
+      throw new Error("There is no wallet available");
+    }
 
-      const walletPk = this.wallet.publicKey;
-      const recentBlockhash = await this.connection.getLatestBlockhash();
+    const walletPk = this.wallet.publicKey;
+    const recentBlockhash = await this.connection.getLatestBlockhash();
 
-      const {
-        communityMintPk,
+    const {
+      communityMintPk,
+      councilMintPk,
+      transaction: mintTransaction,
+    } = await this.createMintsForDao(walletPk, recentBlockhash);
+
+    const { walletAssociatedTokenAccountPk, transaction: membersTransaction } =
+      await this.mintCouncilTokensToMembers(
+        walletPk,
+        councilWalletsPks,
         councilMintPk,
-        transaction: mintTransaction,
-      } = await this.createMintsForDao(walletPk, recentBlockhash);
-
-      const { walletAtaPk, transaction: membersTransaction } =
-        await this.mintCouncilTokensToMembers(
-          walletPk,
-          councilWalletsPks,
-          councilMintPk,
-          recentBlockhash
-        );
-
-      const { daoPk, transaction: daoTransaction } =
-        await this.createConfiguredDao(
-          name,
-          yesVoteThreshold,
-          walletPk,
-          communityMintPk,
-          councilMintPk,
-          walletAtaPk,
-          recentBlockhash
-        );
-
-      const transactions = [
-        mintTransaction,
-        membersTransaction,
-        daoTransaction,
-      ];
-
-      const signatures = await sendTransactions(
-        this.wallet,
-        this.connection,
-        transactions,
         recentBlockhash
       );
 
-      return {
-        daoPk,
-        communityMintPk: communityMintPk,
-        councilMintPk: councilMintPk,
-        signatures,
-      };
-    } catch (ex) {
-      console.error(ex);
-      throw ex;
-    }
+    const { daoPk, transaction: daoTransaction } =
+      await this.createConfiguredDao(
+        name,
+        yesVoteThreshold,
+        walletPk,
+        communityMintPk,
+        councilMintPk,
+        walletAssociatedTokenAccountPk,
+        recentBlockhash
+      );
+
+    const transactions = [mintTransaction, membersTransaction, daoTransaction];
+
+    const signatures = await sendTransactions(
+      this.wallet,
+      this.connection,
+      transactions,
+      recentBlockhash
+    );
+
+    return {
+      daoPk,
+      communityMintPk: communityMintPk,
+      councilMintPk: councilMintPk,
+      signatures,
+    };
   }
 
   private async mintCouncilTokensToMembers(
@@ -112,20 +101,26 @@ export class DaoService {
     recentBlockhash: BlockhashWithExpiryBlockHeight
   ): Promise<{
     transaction: Transaction;
-    walletAtaPk: PublicKey;
+    walletAssociatedTokenAccountPk: PublicKey;
   }> {
     const instructions: TransactionInstruction[] = [];
-    let walletAtaPk: PublicKey | undefined;
+    let walletAssociatedTokenAccountPk: PublicKey | undefined;
     if (!this.wallet) {
       throw new Error("There is no wallet available");
+    }
+
+    const isWalletInCouncilWallets = councilWalletsPks.some((teamWalletPk) =>
+      teamWalletPk.equals(walletPk)
+    );
+    if (!isWalletInCouncilWallets) {
+      throw new Error("Current wallet must be in the team");
     }
 
     for (const teamWalletPk of councilWalletsPks) {
       const associatedTokenAccount =
         await this.tokenRepository.createAssociatedTokenAccount(
           councilMintPk,
-          teamWalletPk,
-          walletPk
+          teamWalletPk
         );
 
       const mint = await this.tokenRepository.mintTo(
@@ -141,11 +136,8 @@ export class DaoService {
       );
 
       if (teamWalletPk.equals(walletPk)) {
-        walletAtaPk = associatedTokenAccount.publicKey;
+        walletAssociatedTokenAccountPk = associatedTokenAccount.publicKey;
       }
-    }
-    if (!walletAtaPk) {
-      throw new Error("Current wallet must be in the team");
     }
 
     const transaction = new Transaction({
@@ -156,7 +148,10 @@ export class DaoService {
 
     instructions.forEach((instruction) => transaction.add(instruction));
 
-    return { transaction, walletAtaPk };
+    return {
+      transaction,
+      walletAssociatedTokenAccountPk: walletAssociatedTokenAccountPk!,
+    };
   }
 
   private async createMintsForDao(
@@ -174,15 +169,13 @@ export class DaoService {
     const communityMint = await this.tokenRepository.createMint(
       walletPk,
       null,
-      communityMintDecimals,
-      walletPk
+      communityMintDecimals
     );
 
     const councilMint = await this.tokenRepository.createMint(
       walletPk,
       null,
-      0,
-      walletPk
+      0
     );
 
     const transaction = new Transaction({
@@ -220,7 +213,7 @@ export class DaoService {
     walletPk: PublicKey,
     communityMintPk: PublicKey,
     councilMintPk: PublicKey,
-    walletAtaPk: PublicKey,
+    walletAssociatedTokenAccountPk: PublicKey,
     recentBlockhash: BlockhashWithExpiryBlockHeight
   ): Promise<{ daoPk: PublicKey; transaction: Transaction }> {
     if (!this.wallet) {
@@ -233,7 +226,7 @@ export class DaoService {
       walletPk,
       communityMintPk,
       councilMintPk,
-      walletAtaPk
+      walletAssociatedTokenAccountPk
     );
 
     const transaction = new Transaction({

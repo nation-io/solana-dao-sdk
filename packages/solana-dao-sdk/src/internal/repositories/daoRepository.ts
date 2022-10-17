@@ -15,7 +15,7 @@ import {
   DEFAULT_COMMUNITY_MINT_MAX_VOTE_WEIGHT_SOURCE,
   governancePk,
   governanceProgramVersion,
-  MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+  MIN_COMMUNITY_TOKENS_TO_CREATE_WITH_ZERO_SUPPLY,
 } from "../../constants";
 import {
   getMintNaturalAmountFromDecimal,
@@ -24,8 +24,6 @@ import {
 import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { Wallet } from "../../wallet";
 
-// The community mint is going to have 0 supply and we arbitrarily set it to 1m
-const minCommunityTokensToCreate = MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY;
 const communityMintDecimals = 6;
 const tokenAmount = 1;
 
@@ -48,16 +46,19 @@ export class DaoRepository {
     walletPk: PublicKey,
     communityMintPk: PublicKey,
     councilMintPk: PublicKey,
-    walletAtaPk: PublicKey
+    walletAssociatedTokenAccountPk: PublicKey
   ): Promise<{
     daoPk: PublicKey;
     instructions: TransactionInstruction[];
   }> {
+    const communityTokenConfig = undefined;
+    const councilTokenConfig = undefined;
+    const voterWeightRecord = undefined;
     const instructions: TransactionInstruction[] = [];
 
     const minCommunityTokensToCreateAsMintValue = new BN(
       getMintNaturalAmountFromDecimal(
-        minCommunityTokensToCreate,
+        MIN_COMMUNITY_TOKENS_TO_CREATE_WITH_ZERO_SUPPLY,
         communityMintDecimals
       )
     );
@@ -73,7 +74,8 @@ export class DaoRepository {
       councilMintPk,
       DEFAULT_COMMUNITY_MINT_MAX_VOTE_WEIGHT_SOURCE,
       minCommunityTokensToCreateAsMintValue,
-      undefined
+      communityTokenConfig,
+      councilTokenConfig
     );
 
     await withDepositGoverningTokens(
@@ -81,7 +83,7 @@ export class DaoRepository {
       governancePk,
       governanceProgramVersion,
       realmPk,
-      walletAtaPk,
+      walletAssociatedTokenAccountPk,
       councilMintPk,
       walletPk,
       walletPk,
@@ -136,7 +138,7 @@ export class DaoRepository {
       tokenOwnerRecordPk,
       walletPk,
       walletPk,
-      undefined
+      voterWeightRecord
     );
 
     // Set the community governance as the realm authority

@@ -58,12 +58,16 @@ export class SolanaDao {
   }
 
   async createDao(
-    councilWalletsPks: PublicKey[],
     name: string,
-    yesVoteThreshold: number
+    councilWalletsPks: PublicKey[] = [],
+    yesVoteThreshold: number = 60
   ): Promise<MultiSigDaoResponse> {
     if (!this.wallet) {
       throw new Error("There is no wallet available");
+    }
+
+    if (councilWalletsPks.length === 0) {
+      councilWalletsPks.push(this.wallet.publicKey);
     }
 
     const response = await this.service.createMultisigDao(

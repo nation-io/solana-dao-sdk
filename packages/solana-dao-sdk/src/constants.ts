@@ -8,4 +8,8 @@ export const governancePk = new PublicKey(
 
 export const DEFAULT_COMMUNITY_MINT_MAX_VOTE_WEIGHT_SOURCE =
   MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION;
-export const MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY = 1000000;
+export const MIN_COMMUNITY_TOKENS_TO_CREATE_WITH_ZERO_SUPPLY = 1000000;
+
+export const TOKEN_PROGRAM_ID = new PublicKey(
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+);

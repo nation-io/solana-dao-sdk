@@ -19,12 +19,7 @@ export async function createWallet(
     lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
   });
 
-  const balance = await connection.getBalance(keypair.publicKey);
-  console.log(`Wallet ${keypair.publicKey} created with: ${balance} LAMPORTS`);
-
-  const wallet = new TestWallet(keypair);
-
-  return wallet;
+  return new TestWallet(keypair);
 }
 
 export function randomId() {

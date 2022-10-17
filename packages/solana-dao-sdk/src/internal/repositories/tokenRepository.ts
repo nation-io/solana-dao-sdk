@@ -14,8 +14,8 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
+import { TOKEN_PROGRAM_ID } from "../../constants";
 import { Wallet } from "../../wallet";
-import { TOKEN_PROGRAM_ID } from "../tokens";
 
 export class TokenRepository {
   connection: Connection;
@@ -32,9 +32,11 @@ export class TokenRepository {
 
   public async createAssociatedTokenAccount(
     mintPk: PublicKey,
-    ownerPk: PublicKey,
-    payerPk: PublicKey
+    ownerPk: PublicKey
   ) {
+    if (!this.wallet) {
+      throw new Error("There is no wallet available");
+    }
     const instructions: TransactionInstruction[] = [];
 
     const ataPk = await getAssociatedTokenAddress(
@@ -47,7 +49,7 @@ export class TokenRepository {
 
     instructions.push(
       createAssociatedTokenAccountInstruction(
-        payerPk,
+        this.wallet.publicKey,
         ataPk,
         ownerPk,
         mintPk,
@@ -62,9 +64,12 @@ export class TokenRepository {
   public async createMint(
     ownerPk: PublicKey,
     freezeAuthorityPk: PublicKey | null,
-    decimals: number,
-    payerPk: PublicKey
+    decimals: number
   ) {
+    if (!this.wallet) {
+      throw new Error("There is no wallet available");
+    }
+
     const mintRentExempt =
       await this.connection.getMinimumBalanceForRentExemption(MintLayout.span);
 
@@ -75,7 +80,7 @@ export class TokenRepository {
 
     instructions.push(
       SystemProgram.createAccount({
-        fromPubkey: payerPk,
+        fromPubkey: this.wallet.publicKey,
         newAccountPubkey: mintAccount.publicKey,
         lamports: mintRentExempt,
         space: MintLayout.span,
