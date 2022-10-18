@@ -1,18 +1,12 @@
 import { Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
-import {
-  getRealm,
-  getAllTokenOwnerRecords,
-  BN_ZERO,
-} from "@solana/spl-governance";
+import { getAllTokenOwnerRecords, BN_ZERO } from "@solana/spl-governance";
 import {
   DaoService,
   MultiSigDaoResponse,
 } from "./internal/services/daoService";
 import { Wallet } from "./wallet";
+import { DEFAULT_PROGRAM_ID } from "./constants";
 
-const DEFAULT_PROGRAM_ID = new PublicKey(
-  "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY"
-);
 /**
  * Note: This interface is an abstraction introduced by the SDK so that consumers don't care about having to (de)serialize deprecated or unused fields
  * or the fact that some fields are nester in other objects.
@@ -70,40 +64,19 @@ export class SolanaDao {
       councilWalletsPks.push(this.wallet.publicKey);
     }
 
-    const response = await this.service.createMultisigDao(
+    return this.service.createMultisigDao(
       councilWalletsPks,
       name,
       yesVoteThreshold
     );
-
-    return response;
   }
 
   async getDao(daoPublicKey: PublicKey): Promise<Dao | null> {
-    const realm = (await getRealm(this.connection, daoPublicKey)).account;
-
-    return {
-      publicKey: daoPublicKey,
-      name: realm.name,
-      authority: realm.authority,
-      communityMint: realm.communityMint,
-      councilMint: realm.config.councilMint,
-      minCommunityTokensToCreateGovernance:
-        realm.config.minCommunityTokensToCreateGovernance.toString(10),
-      votingProposalCount: realm.votingProposalCount,
-    };
+    return this.service.getDao(daoPublicKey);
   }
 
   async getMembers(daoPublicKey: PublicKey): Promise<Member[]> {
-    const allTokenRecords = await getAllTokenOwnerRecords(
-      this.connection,
-      DEFAULT_PROGRAM_ID,
-      daoPublicKey
-    );
-    return allTokenRecords
-      .map((record) => record.account)
-      .filter((account) => account.governingTokenDepositAmount.gt(BN_ZERO))
-      .map((account) => ({ publicKey: account.governingTokenOwner }));
+    return this.service.getMembers(daoPublicKey);
   }
 
   getDaos(): Array<Dao> {
