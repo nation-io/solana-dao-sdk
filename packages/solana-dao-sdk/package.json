@@ -10,8 +10,7 @@
   "scripts": {
     "watch": "parcel watch",
     "build": "parcel build",
-    "test": "jest",
-    "pretest": "yarn build"
+    "test": "jest"
   },
   "files": [
     "dist"
@@ -33,7 +32,11 @@
   "homepage": "https://github.com/nation-io/sdk#readme",
   "dependencies": {
     "@solana/web3.js": "^1.62.0",
-    "@solana/spl-governance": "^0.3.14"
+    "@solana/spl-governance": "^0.3.14",
+    "@solana/spl-token": "^0.3.5",
+    "bignumber.js": "^9.1.0",
+    "bn.js": "^5.2.1",
+    "bs58": "^5.0.0"
   },
   "devDependencies": {
     "@open-wc/building-rollup": "^2.0.2",
