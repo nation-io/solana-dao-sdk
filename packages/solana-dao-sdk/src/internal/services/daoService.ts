@@ -10,6 +10,13 @@ import { Wallet } from "../../wallet";
 import { TokenRepository } from "../repositories/tokenRepository";
 import { DaoRepository } from "../repositories/daoRepository";
 import { sendTransactions } from "../sender";
+import {
+  BN_ZERO,
+  getAllTokenOwnerRecords,
+  getRealm,
+} from "@solana/spl-governance";
+import { Dao, Member } from "../..";
+import { DEFAULT_PROGRAM_ID } from "../../constants";
 
 const communityMintDecimals = 6;
 const tokenAmount = 1;
@@ -92,6 +99,37 @@ export class DaoService {
       councilMintPk: councilMintPk,
       signatures,
     };
+  }
+
+  public async getDao(daoPublicKey: PublicKey): Promise<Dao | null> {
+    const program = await getRealm(this.connection, daoPublicKey);
+    const realm = program.account;
+
+    const dao: Dao = {
+      publicKey: daoPublicKey,
+      name: realm.name,
+      authority: realm.authority,
+      communityMint: realm.communityMint,
+      councilMint: realm.config.councilMint,
+      minCommunityTokensToCreateGovernance:
+        realm.config.minCommunityTokensToCreateGovernance.toString(10),
+      votingProposalCount: realm.votingProposalCount,
+    };
+
+    return dao;
+  }
+
+  public async getMembers(daoPublicKey: PublicKey): Promise<Member[]> {
+    const allTokenRecords = await getAllTokenOwnerRecords(
+      this.connection,
+      DEFAULT_PROGRAM_ID,
+      daoPublicKey
+    );
+
+    return allTokenRecords
+      .map((record) => record.account)
+      .filter((account) => account.governingTokenDepositAmount.gt(BN_ZERO))
+      .map((account) => ({ publicKey: account.governingTokenOwner }));
   }
 
   private async mintCouncilTokensToMembers(

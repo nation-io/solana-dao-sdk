@@ -13,3 +13,7 @@ export const MIN_COMMUNITY_TOKENS_TO_CREATE_WITH_ZERO_SUPPLY = 1000000;
 export const TOKEN_PROGRAM_ID = new PublicKey(
   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
 );
+
+export const DEFAULT_PROGRAM_ID = new PublicKey(
+  "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY"
+);
