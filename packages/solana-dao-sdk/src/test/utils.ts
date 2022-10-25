@@ -7,7 +7,7 @@ export async function createWallet(
 ): Promise<TestWallet> {
   const keypair = Keypair.generate();
 
-  let airdropSignature = await connection.requestAirdrop(
+  const airdropSignature = await connection.requestAirdrop(
     keypair.publicKey,
     initialBalance
   );

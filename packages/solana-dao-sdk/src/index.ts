@@ -1,11 +1,9 @@
 import { Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
-import { getAllTokenOwnerRecords, BN_ZERO } from "@solana/spl-governance";
 import {
   DaoService,
   MultiSigDaoResponse,
 } from "./internal/services/daoService";
 import { Wallet } from "./wallet";
-import { DEFAULT_PROGRAM_ID } from "./constants";
 
 /**
  * Note: This interface is an abstraction introduced by the SDK so that consumers don't care about having to (de)serialize deprecated or unused fields
@@ -22,7 +20,7 @@ export type Dao = {
   // Optional mint address of the token to be used to represent voting power in the council
   councilMint?: PublicKey;
   // Min number of community tokens required to create a governance
-  minCommunityTokensToCreateGovernance: String; // TODO should be BN, but the test fails
+  minCommunityTokensToCreateGovernance: string; // TODO should be BN, but the test fails
   // The number of proposals in voting state
   votingProposalCount: number;
 };
@@ -54,7 +52,7 @@ export class SolanaDao {
   async createDao(
     name: string,
     councilWalletsPks: PublicKey[] = [],
-    yesVoteThreshold: number = 60
+    yesVoteThreshold = 60
   ): Promise<MultiSigDaoResponse> {
     if (!this.wallet) {
       throw new Error("There is no wallet available");
