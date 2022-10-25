@@ -3,5 +3,6 @@
     "es2021": true
   },
   "parser": "@typescript-eslint/parser",
+  "extends": ["prettier"],
   "root": true
 }

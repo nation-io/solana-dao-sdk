@@ -9,20 +9,20 @@ import {
   VoteTipping,
   withCreateMintGovernance,
   withSetRealmAuthority,
-} from "@solana/spl-governance";
-import BN from "bn.js";
+} from '@solana/spl-governance';
+import BN from 'bn.js';
 import {
   DEFAULT_COMMUNITY_MINT_MAX_VOTE_WEIGHT_SOURCE,
   governancePk,
   governanceProgramVersion,
   MIN_COMMUNITY_TOKENS_TO_CREATE_WITH_ZERO_SUPPLY,
-} from "../../constants";
+} from '../../constants';
 import {
   getMintNaturalAmountFromDecimal,
   getTimestampFromDays,
-} from "../units";
-import { Connection, PublicKey, TransactionInstruction } from "@solana/web3.js";
-import { Wallet } from "../../wallet";
+} from '../units';
+import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Wallet } from '../../wallet';
 
 const communityMintDecimals = 6;
 const tokenAmount = 1;
@@ -46,7 +46,7 @@ export class DaoRepository {
     walletPk: PublicKey,
     communityMintPk: PublicKey,
     councilMintPk: PublicKey,
-    walletAssociatedTokenAccountPk: PublicKey
+    walletAssociatedTokenAccountPk: PublicKey,
   ): Promise<{
     daoPk: PublicKey;
     instructions: TransactionInstruction[];
@@ -59,8 +59,8 @@ export class DaoRepository {
     const minCommunityTokensToCreateAsMintValue = new BN(
       getMintNaturalAmountFromDecimal(
         MIN_COMMUNITY_TOKENS_TO_CREATE_WITH_ZERO_SUPPLY,
-        communityMintDecimals
-      )
+        communityMintDecimals,
+      ),
     );
 
     const realmPk = await withCreateRealm(
@@ -75,7 +75,7 @@ export class DaoRepository {
       DEFAULT_COMMUNITY_MINT_MAX_VOTE_WEIGHT_SOURCE,
       minCommunityTokensToCreateAsMintValue,
       communityTokenConfig,
-      councilTokenConfig
+      councilTokenConfig,
     );
 
     await withDepositGoverningTokens(
@@ -88,14 +88,14 @@ export class DaoRepository {
       walletPk,
       walletPk,
       walletPk,
-      new BN(tokenAmount)
+      new BN(tokenAmount),
     );
 
     const tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
       governancePk,
       realmPk,
       councilMintPk,
-      walletPk
+      walletPk,
     );
 
     // Put community and council mints under the realm governance with default config
@@ -138,7 +138,7 @@ export class DaoRepository {
       tokenOwnerRecordPk,
       walletPk,
       walletPk,
-      voterWeightRecord
+      voterWeightRecord,
     );
 
     // Set the community governance as the realm authority
@@ -149,7 +149,7 @@ export class DaoRepository {
       realmPk,
       walletPk,
       communityMintGovPk,
-      SetRealmAuthorityAction.SetChecked
+      SetRealmAuthorityAction.SetChecked,
     );
 
     return { daoPk: realmPk, instructions };

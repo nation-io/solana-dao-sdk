@@ -5,7 +5,7 @@ import {
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction,
   createMintToInstruction,
-} from "@solana/spl-token";
+} from '@solana/spl-token';
 
 import {
   Connection,
@@ -13,9 +13,9 @@ import {
   Keypair,
   SystemProgram,
   TransactionInstruction,
-} from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID } from "../../constants";
-import { Wallet } from "../../wallet";
+} from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID } from '../../constants';
+import { Wallet } from '../../wallet';
 
 export class TokenRepository {
   connection: Connection;
@@ -32,10 +32,10 @@ export class TokenRepository {
 
   public async createAssociatedTokenAccount(
     mintPk: PublicKey,
-    ownerPk: PublicKey
+    ownerPk: PublicKey,
   ) {
     if (!this.wallet) {
-      throw new Error("There is no wallet available");
+      throw new Error('There is no wallet available');
     }
     const instructions: TransactionInstruction[] = [];
 
@@ -44,7 +44,7 @@ export class TokenRepository {
       ownerPk,
       false,
       TOKEN_PROGRAM_ID,
-      ASSOCIATED_TOKEN_PROGRAM_ID
+      ASSOCIATED_TOKEN_PROGRAM_ID,
     );
 
     instructions.push(
@@ -54,8 +54,8 @@ export class TokenRepository {
         ownerPk,
         mintPk,
         TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      )
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+      ),
     );
 
     return { publicKey: ataPk, instructions };
@@ -64,10 +64,10 @@ export class TokenRepository {
   public async createMint(
     ownerPk: PublicKey,
     freezeAuthorityPk: PublicKey | null,
-    decimals: number
+    decimals: number,
   ) {
     if (!this.wallet) {
-      throw new Error("There is no wallet available");
+      throw new Error('There is no wallet available');
     }
 
     const mintRentExempt =
@@ -85,7 +85,7 @@ export class TokenRepository {
         lamports: mintRentExempt,
         space: MintLayout.span,
         programId: TOKEN_PROGRAM_ID,
-      })
+      }),
     );
     signers.push(mintAccount);
 
@@ -95,8 +95,8 @@ export class TokenRepository {
         decimals,
         ownerPk,
         freezeAuthorityPk,
-        TOKEN_PROGRAM_ID
-      )
+        TOKEN_PROGRAM_ID,
+      ),
     );
 
     return {
@@ -110,7 +110,7 @@ export class TokenRepository {
     mintPk: PublicKey,
     destinationPk: PublicKey,
     mintAuthorityPk: PublicKey,
-    amount: number | bigint
+    amount: number | bigint,
   ) {
     const instructions: TransactionInstruction[] = [];
 
@@ -121,8 +121,8 @@ export class TokenRepository {
         mintAuthorityPk,
         amount,
         [],
-        TOKEN_PROGRAM_ID
-      )
+        TOKEN_PROGRAM_ID,
+      ),
     );
 
     return { instructions };

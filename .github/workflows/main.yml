@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: ["main"]
+    branches: ['main']
   pull_request:
-    branches: ["main"]
+    branches: ['main']
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -30,6 +30,9 @@ jobs:
       - uses: borales/actions-yarn@v3.0.0
         with:
           cmd: lint:test # will run `yarn lint:test` command
+      - uses: borales/actions-yarn@v3.0.0
+        with:
+          cmd: prettier:check # will run `yarn prettier:check` command
       - uses: borales/actions-yarn@v3.0.0
         with:
           cmd: build # will run `yarn build` command

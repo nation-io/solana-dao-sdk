@@ -1,17 +1,17 @@
-import { Wallet } from "../wallet";
+import { Wallet } from '../wallet';
 import {
   Connection,
   sendAndConfirmRawTransaction,
   Transaction,
   BlockhashWithExpiryBlockHeight,
-} from "@solana/web3.js";
-import base58 from "bs58";
+} from '@solana/web3.js';
+import base58 from 'bs58';
 
 export async function sendTransactions(
   wallet: Wallet,
   connection: Connection,
   transactions: Transaction[],
-  recentBlockhash: BlockhashWithExpiryBlockHeight
+  recentBlockhash: BlockhashWithExpiryBlockHeight,
 ): Promise<string[]> {
   const signedTxs = await wallet.signAllTransactions(transactions);
 
@@ -27,8 +27,8 @@ export async function sendTransactions(
         lastValidBlockHeight: recentBlockhash.lastValidBlockHeight,
       },
       {
-        commitment: "confirmed",
-      }
+        commitment: 'confirmed',
+      },
     );
 
     transactionsSignatures.push(transactionSignature);

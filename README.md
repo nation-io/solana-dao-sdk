@@ -14,15 +14,22 @@ For now, there are very few commands and will change soon.
 yarn install ## or npm install
 ```
 
-- Build the SDK library
+- Build the SDK library and the React frontend
 
 ```bash
 yarn build
 ```
 
+- Build the SDK library
+
+```bash
+yarn build:sdk
+```
+
 - Build the SDK library in watch mode.
 
 ```bash
+# Being in the packages/solana-dao-sdk folder
 yarn watch
 ```
 
@@ -32,14 +39,13 @@ yarn watch
 yarn web
 ```
 
-
 ## SDK Functions
 
 This SDK exports a SolanaDAO class that is used to instantiate an object containing the following functions:
 
-- createDAO 
+- createDAO
   - used for creating a new DAO.
-  - parameters: 
+  - parameters:
     - name: string,
     - councilWalletPks: PublicKey[] = [],
     - yesVoteThreshold: number = 60,
@@ -47,7 +53,7 @@ This SDK exports a SolanaDAO class that is used to instantiate an object contain
     - Promise<MultiSigDaoResponse>
 - getDao
   - used for getting info from an existing DAO
-  - parameters: 
+  - parameters:
     - daoPublicKey: PublicKey
   - returns:
     - Promise<Dao>
@@ -59,21 +65,22 @@ This SDK exports a SolanaDAO class that is used to instantiate an object contain
     - Promise<Member[]>
 
 ## Getting Started
-  
+
 Some sample code to import the SDK and run some of the SDK functions:
-  
+
 ```
 import { SolanaDao } from "solana-dao-sdk"; //SDK is imported here
 import { PublicKey } from "@solana/web3.js";
 
 let id = "abc123"
 const client = new SolanaDao()
-  
+
 client.createDAO("myDaoName",[new PublicKey(id)],100)
 client.getDao(new PublicKey(id))
 client.getMembers(new PublicKey(id))
-  
+
 ```
+
 ## Sample Code
 
 Here is some sample code to import the SDK and create a Provider that provides the SolanaDAO object.
@@ -155,6 +162,7 @@ export const DaoPage: React.FunctionComponent = () => {
 ```
 
 ## Example
-A simple frontend that utilizes the SDK has been provided. It uses the sample code shown above. 
-  
+
+A simple frontend that utilizes the SDK has been provided. It uses the sample code shown above.
+
 You can run the example with `yarn web`

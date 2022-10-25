@@ -4,9 +4,9 @@ import {
   Typography,
   CardActions,
   Button,
-} from "@mui/material";
-import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+} from '@mui/material';
+import { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const DaoCard: React.FunctionComponent<{ id: string; name: string }> = ({
   id,

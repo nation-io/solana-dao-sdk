@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { PublicKey } from "@solana/web3.js";
-import { useParams } from "react-router-dom";
-import { Dao } from "solana-dao-sdk/src";
-import { useDaoClient } from "../providers/DaoProvider";
+import { useCallback, useEffect, useState } from 'react';
+import { PublicKey } from '@solana/web3.js';
+import { useParams } from 'react-router-dom';
+import { Dao } from 'solana-dao-sdk/src';
+import { useDaoClient } from '../providers/DaoProvider';
 
 export const DaoPage: React.FunctionComponent = () => {
   const client = useDaoClient();

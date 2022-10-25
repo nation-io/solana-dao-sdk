@@ -1,12 +1,12 @@
-import React from "react";
-import "./App.css";
-import CssBaseline from "@mui/material/CssBaseline";
-import { Container } from "@mui/material";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { DaoProvider } from "./providers/DaoProvider";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Homepage } from "./components/HomePage";
-import { DaoPage } from "./components/DaoPage";
+import React from 'react';
+import './App.css';
+import CssBaseline from '@mui/material/CssBaseline';
+import { Container } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { DaoProvider } from './providers/DaoProvider';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Homepage } from './components/HomePage';
+import { DaoPage } from './components/DaoPage';
 
 const theme = createTheme();
 
