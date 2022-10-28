@@ -60,6 +60,8 @@ This SDK exports a SolanaDAO class that is used to instantiate an object contain
 
 ## Getting Started
   
+Some sample code to import the SDK and run some of the SDK functions:
+  
 ```
 import { SolanaDao } from "solana-dao-sdk"; //SDK is imported here
 import { PublicKey } from "@solana/web3.js";
@@ -153,4 +155,6 @@ export const DaoPage: React.FunctionComponent = () => {
 ```
 
 ## Example
-A simple frontend that utilizes the SDK has been provided. It uses the sample code shown above. You can run the example with `yarn web`
+A simple frontend that utilizes the SDK has been provided. It uses the sample code shown above. 
+  
+You can run the example with `yarn web`
