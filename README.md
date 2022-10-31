@@ -68,7 +68,7 @@ This SDK exports a SolanaDAO class that is used to instantiate an object contain
 
 Some sample code to import the SDK and run some of the SDK functions:
 
-```
+```jsx
 import { SolanaDao } from "solana-dao-sdk"; //SDK is imported here
 import { PublicKey } from "@solana/web3.js";
 
@@ -85,7 +85,7 @@ client.getMembers(new PublicKey(id))
 
 Here is some sample code to import the SDK and create a Provider that provides the SolanaDAO object.
 
-```
+```jsx
 import React, { createContext, PropsWithChildren, useContext } from "react";
 import { SolanaDao } from "solana-dao-sdk"; //SDK is imported here
 
@@ -117,7 +117,7 @@ export const DaoProvider: React.FunctionComponent<PropsWithChildren> = ({
 
 Here is some sample code consuming the Provider:
 
-```
+```jsx
 import { useCallback, useEffect, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import { useParams } from "react-router-dom";
