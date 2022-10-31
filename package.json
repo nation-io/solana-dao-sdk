@@ -4,9 +4,14 @@
   "private": true,
   "scripts": {
     "build": "lerna run build",
+    "build:sdk": "lerna run build --scope=solana-dao-sdk",
     "test": "CI=true lerna run test",
     "test:debug": "lerna run test --scope=solana-dao-sdk -- ",
     "test:sdk": "lerna run test --scope=solana-dao-sdk",
+    "lint:test": "lerna run lint:test",
+    "lint:fix": "lerna run lint:fix",
+    "prettier:check": "prettier --check .",
+    "format:test": "yarn lint:test && yarn prettier:check",
     "web": "lerna run build && lerna run start --scope=react-app-example-daos",
     "clean": "lerna clean && rm -rf ./node_modules"
   },
@@ -25,6 +30,11 @@
   "homepage": "https://github.com/nation-io/sdk#readme",
   "devDependencies": {
     "@lerna/clean": "^5.5.2",
-    "lerna": "^5.5.2"
+    "eslint-config-prettier": "^8.5.0",
+    "lerna": "^5.5.2",
+    "prettier": "^2.7.1"
+  },
+  "resolutions": {
+    "typescript": "~4.7"
   }
 }

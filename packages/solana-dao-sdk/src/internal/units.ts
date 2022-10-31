@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from 'bignumber.js';
 
 const SECONDS_PER_DAY = 86400;
 
@@ -9,7 +9,7 @@ export function getTimestampFromDays(days: number) {
 // Converts amount in decimals to mint amount (natural units)
 export function getMintNaturalAmountFromDecimal(
   decimalAmount: number,
-  decimals: number
+  decimals: number,
 ) {
   return new BigNumber(decimalAmount).shiftedBy(decimals).toNumber();
 }

@@ -1,4 +1,3 @@
-
 # Welcome to the Solana DAO SDK
 
 First, thank you for contributing to our project!
@@ -12,4 +11,3 @@ At least for now that the project is private and in its initial state we will fo
 [Work in Progress]
 
 We need to add the tools and frameworks we use or plan to add. ESLint, Prettier, Yarn, Lerna, Jest, Typescript and so on.
-

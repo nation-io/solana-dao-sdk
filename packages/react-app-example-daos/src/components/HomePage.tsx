@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { useDaoClient } from "../providers/DaoProvider";
-import { PublicKey } from "@solana/web3.js";
-import { Grid } from "@mui/material";
-import { DaoCard } from "./DaoCard";
-import { Dao } from "solana-dao-sdk/src";
-import mainnetDaos from "../utils/mainnet.json";
+import { useEffect, useState } from 'react';
+import { useDaoClient } from '../providers/DaoProvider';
+import { PublicKey } from '@solana/web3.js';
+import { Grid } from '@mui/material';
+import { DaoCard } from './DaoCard';
+import { Dao } from 'solana-dao-sdk/src';
+import mainnetDaos from '../utils/mainnet.json';
 
 type MainnetDao = {
   symbol: string;
@@ -25,7 +25,7 @@ function toDao(jsonDao: MainnetDao): Partial<Dao> {
 }
 
 function isValid(
-  dao: Partial<Dao>
+  dao: Partial<Dao>,
 ): dao is { publicKey: PublicKey; name: string } {
   return !!dao.publicKey && !!dao.name;
 }

@@ -1,7 +1,7 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey } from '@solana/web3.js';
 
-import { Transaction } from "@solana/web3.js";
-import { Keypair } from "@solana/web3.js";
+import { Transaction } from '@solana/web3.js';
+import { Keypair } from '@solana/web3.js';
 
 export interface Wallet {
   publicKey: PublicKey;

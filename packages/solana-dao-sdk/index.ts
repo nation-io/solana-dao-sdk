@@ -1,3 +1,3 @@
-import { SolanaDao } from "./src/index";
+import { SolanaDao } from './src/index';
 
 export { SolanaDao };
