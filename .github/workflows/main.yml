@@ -29,10 +29,7 @@ jobs:
           cmd: install # will run `yarn install` command
       - uses: borales/actions-yarn@v3.0.0
         with:
-          cmd: lint:test # will run `yarn lint:test` command
-      - uses: borales/actions-yarn@v3.0.0
-        with:
-          cmd: prettier:check # will run `yarn prettier:check` command
+          cmd: format:test # will run `yarn format:test` command
       - uses: borales/actions-yarn@v3.0.0
         with:
           cmd: build # will run `yarn build` command

@@ -14,7 +14,7 @@ For now, there are very few commands and will change soon.
 yarn install ## or npm install
 ```
 
-- Build the SDK library and the React frontend
+- Build the SDK library and the React sample frontend
 
 ```bash
 yarn build
