@@ -69,16 +69,15 @@ This SDK exports a SolanaDAO class that is used to instantiate an object contain
 Some sample code to import the SDK and run some of the SDK functions:
 
 ```jsx
-import { SolanaDao } from "solana-dao-sdk"; //SDK is imported here
-import { PublicKey } from "@solana/web3.js";
+import { SolanaDao } from 'solana-dao-sdk'; //SDK is imported here
+import { PublicKey } from '@solana/web3.js';
 
-let id = "abc123"
-const client = new SolanaDao()
+let id = 'abc123';
+const client = new SolanaDao();
 
-client.createDAO("myDaoName",[new PublicKey(id)],100)
-client.getDao(new PublicKey(id))
-client.getMembers(new PublicKey(id))
-
+client.createDAO('myDaoName', [new PublicKey(id)], 100);
+client.getDao(new PublicKey(id));
+client.getMembers(new PublicKey(id));
 ```
 
 ## Sample Code
@@ -86,18 +85,18 @@ client.getMembers(new PublicKey(id))
 Here is some sample code to import the SDK and create a Provider that provides the SolanaDAO object.
 
 ```jsx
-import React, { createContext, PropsWithChildren, useContext } from "react";
-import { SolanaDao } from "solana-dao-sdk"; //SDK is imported here
+import React, { createContext, PropsWithChildren, useContext } from 'react';
+import { SolanaDao } from 'solana-dao-sdk'; //SDK is imported here
 
 type ContextType = SolanaDao;
 
-export const DaoContext = createContext<ContextType | null>(null);
+export const DaoContext = (createContext < ContextType) | (null > null);
 
 export const useDaoClient = (): ContextType => {
   const value = useContext(DaoContext);
 
   if (value === null) {
-    throw new Error("useDaoClient must be used within a DaoProvider");
+    throw new Error('useDaoClient must be used within a DaoProvider');
   }
 
   return value;
@@ -107,28 +106,29 @@ export const DaoProvider: React.FunctionComponent<PropsWithChildren> = ({
   children,
 }) => {
   return (
-    <DaoContext.Provider value={new SolanaDao()}> //Creating the provider for the SolanaDao object
+    <DaoContext.Provider value={new SolanaDao()}>
+      {' '}
+      //Creating the provider for the SolanaDao object
       {children}
     </DaoContext.Provider>
   );
 };
-
 ```
 
 Here is some sample code consuming the Provider:
 
 ```jsx
-import { useCallback, useEffect, useState } from "react";
-import { PublicKey } from "@solana/web3.js";
-import { useParams } from "react-router-dom";
-import { Dao } from "solana-dao-sdk/src";
-import { useDaoClient } from "../providers/DaoProvider";
+import { useCallback, useEffect, useState } from 'react';
+import { PublicKey } from '@solana/web3.js';
+import { useParams } from 'react-router-dom';
+import { Dao } from 'solana-dao-sdk/src';
+import { useDaoClient } from '../providers/DaoProvider';
 
 export const DaoPage: React.FunctionComponent = () => {
   const client = useDaoClient(); // creating a SolanaDAO object using the Provider
   let { id } = useParams();
 
-  const [dao, setDao] = useState<Dao | null>(null);
+  const [dao, setDao] = (useState < Dao) | (null > null);
 
   const fetchDao = useCallback(async () => {
     if (!id) {
@@ -158,7 +158,6 @@ export const DaoPage: React.FunctionComponent = () => {
     </div>
   );
 };
-
 ```
 
 ## Example
