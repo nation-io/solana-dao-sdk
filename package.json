@@ -11,7 +11,9 @@
     "lint:test": "lerna run lint:test",
     "lint:fix": "lerna run lint:fix",
     "prettier:check": "prettier --check .",
+    "prettier:fix": "prettier --write .",
     "format:test": "yarn lint:test && yarn prettier:check",
+    "format:fix": "yarn lint:fix && yarn prettier:fix",
     "web": "lerna run build && lerna run start --scope=react-app-example-daos",
     "clean": "lerna clean && rm -rf ./node_modules"
   },
