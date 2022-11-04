@@ -45,3 +45,9 @@ While we don't have a template for opening issues, we encourage you that you are
 - Steps to reproduce
 - Environment: environment, OS, solana version etc
 - Proposal: If you happen to know how we may fix the issue, we are more than happy to hear that and you are more than welcome to send a PR!
+
+## Integration Tests
+
+The integration tests run against a Solana validator that runs in a Docker container. The Docker image is maintained by @arielsegura and its entrypoint is `solana-test-validator`. We use a few options from this tool to copy the data we want from `mainnet-beta` to run a few assertions against real DAOs.
+
+To update the governance program on integration tests, please refer to this [question](https://solana.stackexchange.com/questions/3977/how-can-i-download-a-deployable-program-from-mainnet).

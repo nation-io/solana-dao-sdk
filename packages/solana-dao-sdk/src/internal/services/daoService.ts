@@ -16,7 +16,7 @@ import {
   getRealm,
 } from '@solana/spl-governance';
 import { Dao, Member } from '../..';
-import { DEFAULT_PROGRAM_ID } from '../../constants';
+import { governancePk } from '../../constants';
 
 const communityMintDecimals = 6;
 const tokenAmount = 1;
@@ -122,7 +122,7 @@ export class DaoService {
   public async getMembers(daoPublicKey: PublicKey): Promise<Member[]> {
     const allTokenRecords = await getAllTokenOwnerRecords(
       this.connection,
-      DEFAULT_PROGRAM_ID,
+      governancePk,
       daoPublicKey,
     );
 
