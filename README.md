@@ -72,12 +72,16 @@ Some sample code to import the SDK and run some of the SDK functions:
 import { SolanaDao } from 'solana-dao-sdk'; //SDK is imported here
 import { PublicKey } from '@solana/web3.js';
 
-let id = 'abc123';
 const client = new SolanaDao();
 
-client.createDAO('myDaoName', [new PublicKey(id)], 100);
-client.getDao(new PublicKey(id));
-client.getMembers(new PublicKey(id));
+const createdDao = await client.createDAO('myDaoName');
+const retrievedDao = await client.getDao(createdDao.daoPk);
+const actualMembers = await client.getMembers(createdDao.daoPk);
+
+// or create a dao with non-default values
+const voteTreshold = 80;
+const councilMembersPk = [new PublicKey('abc123')];
+await client.createDAO('myDaoName', councilMembersPk, voteTreshold);
 ```
 
 ## Sample Code
